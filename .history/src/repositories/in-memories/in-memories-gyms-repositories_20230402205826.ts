@@ -31,8 +31,9 @@ export class InMemoryGymsRepository implements GymsRepository {
           longitude: item.longitude.toNumber(),
         },
       )
-      return distance < 10
     })
+
+    return distance < 10
   }
 
   async create(data: Prisma.GymCreateInput) {
