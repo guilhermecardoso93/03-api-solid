@@ -19,7 +19,7 @@ describe('Search Gyms (e2e)', () => {
       .post('/gyms')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        title: 'JavaScript Gym',
+        title: 'Duth Gym',
         description: 'Some description.',
         phone: '1199999999',
         latitude: -27.2092052,
@@ -30,7 +30,7 @@ describe('Search Gyms (e2e)', () => {
       .post('/gyms')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        title: 'TypeScript Gym',
+        title: 'Javascript Gym',
         description: 'Some description.',
         phone: '1199999999',
         latitude: -27.2092052,
@@ -40,7 +40,7 @@ describe('Search Gyms (e2e)', () => {
     const response = await request(app.server)
       .get('/gyms/search')
       .query({
-        q: 'JavaScript',
+        q: 'Gym',
       })
       .set('Authorization', `Bearer ${token}`)
       .send()

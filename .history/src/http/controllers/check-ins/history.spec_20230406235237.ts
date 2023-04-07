@@ -2,8 +2,9 @@ import request from 'supertest'
 import { app } from '@/app'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createAndAuthenticateUser } from '@/utils/test/create-and-authenticate-user'
+import { prisma } from '@/lib/prisma'
 
-describe('Search Gyms (e2e)', () => {
+describe('Check-In History (e2e)', () => {
   beforeAll(async () => {
     await app.ready()
   })
@@ -12,45 +13,46 @@ describe('Search Gyms (e2e)', () => {
     await app.close()
   })
 
-  it('should be able to search gyms by title', async () => {
+  it('should be able to create a check in list of history', async () => {
     const { token } = await createAndAuthenticateUser(app)
 
-    await request(app.server)
-      .post('/gyms')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
+    const user = await prisma.user.findFirstOrThrow()
+
+    const gym = await prisma.gym.create({
+      data: {
         title: 'JavaScript Gym',
         description: 'Some description.',
         phone: '1199999999',
         latitude: -27.2092052,
         longitude: -49.6401091,
-      })
+      },
+    })
 
-    await request(app.server)
-      .post('/gyms')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        title: 'TypeScript Gym',
-        description: 'Some description.',
-        phone: '1199999999',
-        latitude: -27.2092052,
-        longitude: -49.6401091,
-      })
+    await prisma.checkIn.createMany({
+      data: [
+        {
+          gym_id: gym.id,
+          user_id: user.id,
+        },
+        {
+          gym_id: gym.id,
+          user_id: user.id,
+        },
+      ],
+    })
 
     const response = await request(app.server)
-      .get('/gyms/search')
-      .query({
-        q: 'JavaScript',
-      })
+      .get(`/check-ins/history`)
       .set('Authorization', `Bearer ${token}`)
       .send()
 
     expect(response.statusCode).toEqual(200)
-    expect(response.body.gyms).toHaveLength(1)
-    expect(response.body.gyms).toEqual([
+    expect(response.body.checkIns).toEqual([
       expect.objectContaining({
-        title: 'JavaScript Gym',
+        gym_id: gym.id,
+        user_id: user.id,
       }),
+      expect.objectContaining({}),
     ])
   })
 })
