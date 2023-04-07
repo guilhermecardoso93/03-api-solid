@@ -7,4 +7,3 @@ declare module '@fastify/jwt' {
       sub: string
     }
   }
-}

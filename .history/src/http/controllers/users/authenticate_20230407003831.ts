@@ -14,8 +14,6 @@ export async function authenticate(
 
   const { email, password } = authenticateBodySchema.parse(request.body)
 
-  const { role } = request.user
-
   try {
     const authenticateUseCase = makeAuthenticateUseCase()
 
@@ -25,9 +23,7 @@ export async function authenticate(
     })
 
     const token = await reply.jwtSign(
-      {
-        role,
-      },
+      {},
       {
         sign: {
           sub: user.id,
